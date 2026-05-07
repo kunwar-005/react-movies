@@ -23,6 +23,7 @@ const API_OPTIONS = {
 method: 'GET',
 headers: {
   accept: 'application/json',
+  Authorization: `Bearer ${API_KEY}`,
 }}
 
 
@@ -33,14 +34,50 @@ const fetchMovies = async (query='') => {
   
   try { 
     const endpoint = query
-      ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${API_KEY}&language=en-US&page=1&include_adult=false`
-      : `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&page=1`;
+      ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&language=en-US&page=1&include_adult=false`
+      : `https://api.themoviedb.org/3/discover/movie?language=en-US&page=1`;
+
+    console.log('Fetching TMDB endpoint:', endpoint)
     const response = await fetch(endpoint, API_OPTIONS)
-    
-    if(!response.ok){
-      throw new Error("error finding movie");
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('TMDB request failed', {
+        endpoint,
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+      })
+
+      if (response.status === 401 || errorText.includes('Invalid API key') || errorText.includes('Authentication failed')) {
+        const fallbackEndpoint = query
+          ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${API_KEY}&language=en-US&page=1&include_adult=false`
+          : `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&page=1`;
+
+        console.log('Retrying with query param fallback:', fallbackEndpoint)
+        const fallbackResponse = await fetch(fallbackEndpoint, { method: 'GET', headers: { accept: 'application/json' } })
+
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json()
+          setmovielist(fallbackData.results || [])
+          if (query && fallbackData.results.length > 0) {
+            await updatecount(query, fallbackData.results[0])
+          }
+          return
+        }
+
+        const fallbackText = await fallbackResponse.text()
+        console.error('TMDB fallback failed', {
+          fallbackEndpoint,
+          status: fallbackResponse.status,
+          statusText: fallbackResponse.statusText,
+          body: fallbackText,
+        })
+      }
+
+      throw new Error(`error finding movie: ${response.status} ${response.statusText} - ${errorText}`)
     }
-    
+
     const data = await response.json()
     console.log('API Response:', data)
     console.log('Results array:', data.results)
