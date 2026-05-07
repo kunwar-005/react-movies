@@ -32,7 +32,9 @@ const fetchMovies = async (query='') => {
   seterrormessage('')
   
   try { 
-    const endpoint = query?`https://api.themoviedb.org/3/search/movie?query=${query}`: `https://api.themoviedb.org/3/discover/movie`;
+    const endpoint = query
+      ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${API_KEY}&language=en-US&page=1&include_adult=false`
+      : `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&page=1`;
     const response = await fetch(endpoint, API_OPTIONS)
     
     if(!response.ok){

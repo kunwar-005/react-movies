@@ -61,7 +61,7 @@ const client = new Client()
         return result.documents;
     }
     catch(e){
-        console.log('Error fetching trending movies:', e)
-        return []; // Return empty array instead of undefined
+        // Appwrite project may be paused or unavailable in development.
+        return []; // Fail gracefully with no trending movies.
     }
   }
