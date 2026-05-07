@@ -6,5 +6,5 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   // Uncomment and set base if deploying to GitHub Pages on a project repository
-  // base: '/your-repo-name/',
+  base: '/react-movies/',
 })
