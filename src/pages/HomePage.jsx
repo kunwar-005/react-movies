@@ -16,14 +16,12 @@ const[isloading,setisloading]=useState(false)
 const [debouncesearch, setDebouncesearch] = useState('')
 const [Trendingmovies, setTrendingmovies ] = useState([])
 
-const API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyYzdiYWEzNzJlZjg1MDczM2U0M2RiMmU5ZTgwYTZlYSIsIm5iZiI6MTc1NzE0NzA2My40Mywic3ViIjoiNjhiYmVmYjcxZjkwNWI3NjdmOWJmYzQ0Iiwic2NvcGVzIjpbImFwaV9yZWFkIl0sInZlcnNpb24iOjF9.EHARvdkBTO3gyCgQFAP9wWrMFRdz1LfbmBfxPvQ5wq8";
-
+const API_KEY = "2c7baa372ef850733e43db2e9e80a6ea";
 
 const API_OPTIONS = {
 method: 'GET',
 headers: {
   accept: 'application/json',
-  Authorization: `Bearer ${API_KEY}`,
 }}
 
 
@@ -34,50 +32,14 @@ const fetchMovies = async (query='') => {
   
   try { 
     const endpoint = query
-      ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&language=en-US&page=1&include_adult=false`
-      : `https://api.themoviedb.org/3/discover/movie?language=en-US&page=1`;
-
-    console.log('Fetching TMDB endpoint:', endpoint)
+      ? `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US&page=1&include_adult=false`
+      : `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&page=1`;
     const response = await fetch(endpoint, API_OPTIONS)
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('TMDB request failed', {
-        endpoint,
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText,
-      })
-
-      if (response.status === 401 || errorText.includes('Invalid API key') || errorText.includes('Authentication failed')) {
-        const fallbackEndpoint = query
-          ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${API_KEY}&language=en-US&page=1&include_adult=false`
-          : `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&page=1`;
-
-        console.log('Retrying with query param fallback:', fallbackEndpoint)
-        const fallbackResponse = await fetch(fallbackEndpoint, { method: 'GET', headers: { accept: 'application/json' } })
-
-        if (fallbackResponse.ok) {
-          const fallbackData = await fallbackResponse.json()
-          setmovielist(fallbackData.results || [])
-          if (query && fallbackData.results.length > 0) {
-            await updatecount(query, fallbackData.results[0])
-          }
-          return
-        }
-
-        const fallbackText = await fallbackResponse.text()
-        console.error('TMDB fallback failed', {
-          fallbackEndpoint,
-          status: fallbackResponse.status,
-          statusText: fallbackResponse.statusText,
-          body: fallbackText,
-        })
-      }
-
-      throw new Error(`error finding movie: ${response.status} ${response.statusText} - ${errorText}`)
+    
+    if(!response.ok){
+      throw new Error(`error finding movie: ${response.status} ${response.statusText}`);
     }
-
+    
     const data = await response.json()
     console.log('API Response:', data)
     console.log('Results array:', data.results)
@@ -137,7 +99,7 @@ const handleCardClick = (movie_id) => {
         <div className="wrapper">
           <header>
             <img src="./hero.png" alt="" />
-            <h1>Find The <span className='text-gradient'>Movies </span> You'll Love</h1>
+            <h1>Findjnsdfkjnasdln The <span className='text-gradient'>Movies </span> You'll Love</h1>
           <Search search={search} setSearch={setSearch} />
           </header>
           
