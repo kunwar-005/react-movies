@@ -99,7 +99,7 @@ const handleCardClick = (movie_id) => {
         <div className="wrapper">
           <header>
             <img src="./hero.png" alt="" />
-            <h1>finddd The <span className='text-gradient'>Movies </span> You'll Love</h1>
+            <h1>find The <span className='text-gradient'>Movies </span> You'll Love</h1>
           <Search search={search} setSearch={setSearch} />
           </header>
           
